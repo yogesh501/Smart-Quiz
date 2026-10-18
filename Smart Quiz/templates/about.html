@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}DBMS Concepts & Architecture — Smart Quiz{% endblock %}
+
+{% block content %}
+<div class="container about-container">
+
+  <!-- Header -->
+  <div style="margin-bottom: 28px; text-align: center;">
+    <div class="hero-pill" style="margin-bottom: 12px;">📖 Project Documentation & Viva Guide</div>
+    <h2 style="font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">DBMS Concepts & Project Architecture</h2>
+    <p style="font-size: 16px; color: var(--text-muted); max-width: 680px; margin: 0 auto;">
+      A comprehensive breakdown of relational database design, SQL queries, and technology integration used in the Smart Quiz project.
+    </p>
+  </div>
+
+  <!-- Section 1: Relational Schema & DBMS Tables -->
+  <div class="doc-section">
+    <h2>🗄️ 1. Database Schema & Tables</h2>
+    <p>
+      The <code>smart_quiz</code> database is designed following relational database management principles with four normalized tables:
+    </p>
+
+    <ul>
+      <li><strong>categories:</strong> Stores the 6 quiz domains (Java, Python, MySQL, DBMS, History, Science) with unique codes and descriptions.</li>
+      <li><strong>questions:</strong> Stores question texts, 4 multiple-choice options (A, B, C, D), the correct option, and educational explanations. Linked to <code>categories</code> via a Foreign Key.</li>
+      <li><strong>users:</strong> Stores simple student registrations (ID and student name). No passwords or unnecessary PII required.</li>
+      <li><strong>quiz_results:</strong> Stores completed quiz attempts including score (out of 10), percentage, date/time, and foreign keys linking to <code>users(id)</code> and <code>categories(id)</code>.</li>
+    </ul>
+
+    <div class="code-box">
+-- Entity-Relationship (ER) Relational Mapping:
+categories (id [PK], name, code, description, icon, created_at)
+    │
+    ├── (1:N) ──> questions (id [PK], category_id [FK], question_text, 
+    │                        option_a, option_b, option_c, option_d, 
+    │                        correct_option, explanation, difficulty)
+    │
+    └── (1:N) ──> quiz_results (id [PK], user_id [FK], category_id [FK], 
+                               score, total_questions, percentage, completion_date)
+                      ▲
+                      │ (1:N)
+users (id [PK], student_name, created_at)
+    </div>
+  </div>
+
+  <!-- Section 2: DBMS Keys & Normalization -->
+  <div class="doc-section">
+    <h2>🔑 2. DBMS Keys & Normalization Concepts</h2>
+    <p>
+      This project demonstrates key database management concepts taught in the 11th-grade syllabus:
+    </p>
+    <ul>
+      <li><strong>Primary Key (PK):</strong> Columns like <code>categories.id</code>, <code>questions.id</code>, <code>users.id</code>, and <code>quiz_results.id</code> use auto-incrementing integers to uniquely identify each row without allowing NULL values.</li>
+      <li><strong>Foreign Key (FK):</strong> <code>questions.category_id</code> refers to <code>categories.id</code>, and <code>quiz_results.user_id</code> refers to <code>users.id</code>. Referential integrity is strictly maintained with <code>ON DELETE CASCADE</code>.</li>
+      <li><strong>Normalization:</strong>
+        <ul style="margin-top: 8px;">
+          <li><strong>1NF (First Normal Form):</strong> All column values are atomic (single-valued), and every row is unique.</li>
+          <li><strong>2NF (Second Normal Form):</strong> Meets 1NF, and all non-key attributes are fully dependent on the primary key (no partial dependencies).</li>
+          <li><strong>3NF (Third Normal Form):</strong> Meets 2NF, with no transitive dependencies (student names live in <code>users</code>, not duplicated inside <code>quiz_results</code>).</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Section 3: SQL Queries Used in the Project -->
+  <div class="doc-section">
+    <h2>⚡ 3. SQL Queries Used in the Application</h2>
+    <p>
+      All database interactions utilize secure, parameterized queries to prevent SQL Injection vulnerabilities:
+    </p>
+
+    <div class="code-box">
+-- 1. Fetching random questions for an attempt without exposing answers:
+SELECT id, category_id, question_text, option_a, option_b, option_c, option_d
+FROM questions
+WHERE category_id = %s
+ORDER BY RAND()
+LIMIT 10;
+
+-- 2. Secure server-side answer retrieval for evaluation:
+SELECT id, correct_option, explanation
+FROM questions
+WHERE id IN (%s, %s, %s, ...);
+
+-- 3. Inserting student attempt result:
+INSERT INTO quiz_results (user_id, category_id, score, total_questions, percentage)
+VALUES (%s, %s, %s, %s, %s);
+
+-- 4. Joining tables for the Leaderboard / History view:
+SELECT r.id, r.score, r.total_questions, r.percentage, r.completion_date,
+       u.student_name, c.name AS category_name
+FROM quiz_results r
+JOIN users u ON r.user_id = u.id
+JOIN categories c ON r.category_id = c.id
+ORDER BY r.completion_date DESC
+LIMIT 30;
+    </div>
+  </div>
+
+  <!-- Section 4: Technologies & Architecture -->
+  <div class="doc-section">
+    <h2>💻 4. Technologies & Implementation Rationale</h2>
+    <ul>
+      <li><strong>Frontend (HTML, Vanilla CSS, JavaScript):</strong> No heavy frameworks (React/Vue/Tailwind) were used. Hand-crafted clean styling ensures the project runs on any standard web browser instantly.</li>
+      <li><strong>Backend (Python Flask):</strong> Python Flask is lightweight, readable, and standard for school computer science projects. Handles session management, route dispatching, and secure answer evaluation.</li>
+      <li><strong>Java Subject Category:</strong> Java is provided as a prominent beginner-friendly quiz topic (covering OOP, syntax, types, and loops) so students can test their Java knowledge while keeping the web backend clean in Python.</li>
+      <li><strong>Dual Database Engine Support:</strong> The project includes native MySQL connection drivers (<code>PyMySQL</code>) and an automatic SQLite fallback. This guarantees that evaluators can run the project effortlessly on any laptop even if a local MySQL daemon is not currently active!</li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}

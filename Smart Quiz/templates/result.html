@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Results — Smart Quiz{% endblock %}
+
+{% block content %}
+<div class="container result-container">
+
+  <!-- Main Score Card -->
+  <div class="result-card-main">
+    
+    <!-- Score Circle -->
+    <div class="score-circle-wrapper">
+      <div class="score-num">{{ score }}</div>
+      <div class="score-denom">out of {{ total }}</div>
+    </div>
+
+    <!-- Motivational Badge Title & Message -->
+    <h2 class="result-title">{{ badge_title }}</h2>
+    <p class="result-desc">{{ badge_message }}</p>
+
+    <!-- Student & Category Meta -->
+    <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">
+      Student: <strong>{{ student_name }}</strong> &bull; Category: <strong>{{ category_name }}</strong>
+    </div>
+
+    <!-- 4 Breakdown Boxes -->
+    <div class="breakdown-grid">
+      <div class="breakdown-box">
+        <div class="breakdown-val">{{ total }}</div>
+        <div class="breakdown-label">Total Questions</div>
+      </div>
+      <div class="breakdown-box box-correct">
+        <div class="breakdown-val">{{ score }}</div>
+        <div class="breakdown-label">Correct Answers</div>
+      </div>
+      <div class="breakdown-box box-incorrect">
+        <div class="breakdown-val">{{ incorrect }}</div>
+        <div class="breakdown-label">Incorrect Answers</div>
+      </div>
+      <div class="breakdown-box box-percent">
+        <div class="breakdown-val">{{ percentage }}%</div>
+        <div class="breakdown-label">Score Percentage</div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="result-btn-row">
+      <a href="{{ url_for('quiz', category_id=category_id) }}" class="btn-primary" id="btnRetakeQuiz">
+        🔄 Retake Quiz
+      </a>
+      <a href="#review-section" class="btn-secondary" id="btnScrollReview" onclick="document.getElementById('review-section').scrollIntoView({behavior: 'smooth'}); return false;">
+        🔍 Review Answers
+      </a>
+      <a href="{{ url_for('index') }}" class="btn-secondary" id="btnBackHome">
+        🏠 Back to Home
+      </a>
+      <a href="{{ url_for('history') }}" class="btn-secondary" id="btnViewLeaderboard">
+        🏆 Leaderboard
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Review Answers & Explanations Section -->
+  <section class="review-section" id="review-section">
+    <div class="review-section-header">
+      <div>
+        <h3 style="font-size: 22px; font-weight: 800;">Review Answers & Explanations</h3>
+        <p style="font-size: 14px; color: var(--text-muted);">See what you answered right, where you made a mistake, and learn why.</p>
+      </div>
+    </div>
+
+    {% if review_list %}
+      {% for item in review_list %}
+        <div class="review-item-card {% if item.is_correct %}is-correct{% else %}is-incorrect{% endif %}">
+          
+          <div class="review-card-top">
+            <span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Question {{ loop.index }}</span>
+            <span class="review-badge {% if item.is_correct %}correct{% else %}incorrect{% endif %}">
+              {% if item.is_correct %}
+                ✓ Correct (+1)
+              {% else %}
+                ✗ Incorrect (0)
+              {% endif %}
+            </span>
+          </div>
+
+          <h4 class="review-q-title">{{ item.question_text }}</h4>
+
+          <div class="review-options-grid">
+            <!-- Option A -->
+            <div class="review-opt-box 
+              {% if item.correct_option == 'A' %}correct-answer-target
+              {% elif item.selected_option == 'A' and not item.is_correct %}user-choice-wrong{% endif %}">
+              <strong>A:</strong> {{ item.option_a }}
+              {% if item.correct_option == 'A' %}
+                <span style="margin-left: auto; color: var(--success); font-weight: 700;">(Correct)</span>
+              {% elif item.selected_option == 'A' %}
+                <span style="margin-left: auto; color: var(--danger); font-weight: 700;">(Your Choice)</span>
+              {% endif %}
+            </div>
+
+            <!-- Option B -->
+            <div class="review-opt-box 
+              {% if item.correct_option == 'B' %}correct-answer-target
+              {% elif item.selected_option == 'B' and not item.is_correct %}user-choice-wrong{% endif %}">
+              <strong>B:</strong> {{ item.option_b }}
+              {% if item.correct_option == 'B' %}
+                <span style="margin-left: auto; color: var(--success); font-weight: 700;">(Correct)</span>
+              {% elif item.selected_option == 'B' %}
+                <span style="margin-left: auto; color: var(--danger); font-weight: 700;">(Your Choice)</span>
+              {% endif %}
+            </div>
+
+            <!-- Option C -->
+            <div class="review-opt-box 
+              {% if item.correct_option == 'C' %}correct-answer-target
+              {% elif item.selected_option == 'C' and not item.is_correct %}user-choice-wrong{% endif %}">
+              <strong>C:</strong> {{ item.option_c }}
+              {% if item.correct_option == 'C' %}
+                <span style="margin-left: auto; color: var(--success); font-weight: 700;">(Correct)</span>
+              {% elif item.selected_option == 'C' %}
+                <span style="margin-left: auto; color: var(--danger); font-weight: 700;">(Your Choice)</span>
+              {% endif %}
+            </div>
+
+            <!-- Option D -->
+            <div class="review-opt-box 
+              {% if item.correct_option == 'D' %}correct-answer-target
+              {% elif item.selected_option == 'D' and not item.is_correct %}user-choice-wrong{% endif %}">
+              <strong>D:</strong> {{ item.option_d }}
+              {% if item.correct_option == 'D' %}
+                <span style="margin-left: auto; color: var(--success); font-weight: 700;">(Correct)</span>
+              {% elif item.selected_option == 'D' %}
+                <span style="margin-left: auto; color: var(--danger); font-weight: 700;">(Your Choice)</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Explanation Callout -->
+          <div class="explanation-callout">
+            <span style="font-size: 18px;">💡</span>
+            <div>
+              <strong>Explanation:</strong> {{ item.explanation }}
+            </div>
+          </div>
+
+        </div>
+      {% endfor %}
+    {% else %}
+      <div style="background: #ffffff; padding: 24px; border-radius: var(--radius-md); text-align: center; color: var(--text-muted);">
+        Detailed review is only available immediately after submitting a quiz attempt in the active session.
+      </div>
+    {% endif %}
+
+  </section>
+
+</div>
+{% endblock %}

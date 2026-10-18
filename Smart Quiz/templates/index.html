@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Smart Quiz — Learn, Play and Test Your Knowledge{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-pill">🎯 Interactive Quiz Platform</div>
+    <h1 class="hero-title">Smart <span>Quiz</span></h1>
+    <p class="hero-subtitle">Learn, Play and Test Your Knowledge</p>
+    
+    <div class="student-welcome-bar">
+      <span>👋 Welcome! Choose any category below to begin your 10-question quiz test.</span>
+      {% if current_student %}
+        <span>Current Student: <strong>{{ current_student }}</strong></span>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Quick Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-icon">📚</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats.total_questions or 132 }}</span>
+        <span class="stat-label">Total Questions Bank</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats.total_quizzes or 0 }}</span>
+        <span class="stat-label">Quizzes Completed</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">👥</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats.total_students or 0 }}</span>
+        <span class="stat-label">Students Tested</span>
+      </div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats.average_score or 0 }}%</span>
+        <span class="stat-label">Class Average Score</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Categories Section -->
+  <section class="categories-section" id="categories">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Select a Quiz Category</h2>
+        <p class="section-subtitle">Each quiz selects 10 random questions from the database with instant feedback.</p>
+      </div>
+    </div>
+
+    <div class="categories-grid">
+      {% for cat in categories %}
+        <div class="category-card cat-{{ cat.code }}" id="category-card-{{ cat.code }}">
+          <div class="card-header-row">
+            <div class="category-icon-box">
+              {% if cat.code == 'java' %}☕
+              {% elif cat.code == 'python' %}🐍
+              {% elif cat.code == 'mysql' %}🐬
+              {% elif cat.code == 'dbms' %}🗄️
+              {% elif cat.code == 'history' %}🏛️
+              {% elif cat.code == 'science' %}🔬
+              {% else %}📘{% endif %}
+            </div>
+            <span class="question-count-badge">{{ cat.question_count }} Questions</span>
+          </div>
+
+          <h3 class="category-title">{{ cat.name }}</h3>
+          <p class="category-desc">{{ cat.description }}</p>
+
+          <div class="category-footer">
+            <button type="button" class="btn-start-quiz btn-open-quiz-modal" 
+                    data-category-id="{{ cat.id }}" 
+                    data-category-name="{{ cat.name }}"
+                    id="btn-start-{{ cat.code }}">
+              Start Quiz <span>&rarr;</span>
+            </button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}

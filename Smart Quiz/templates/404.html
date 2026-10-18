@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Page Not Found — Smart Quiz{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 60px 20px; text-align: center;">
+  <div style="font-size: 64px; margin-bottom: 16px;">🔍</div>
+  <h1 style="font-size: 36px; font-weight: 800; margin-bottom: 12px;">Page Not Found</h1>
+  <p style="font-size: 16px; color: var(--text-muted); max-width: 500px; margin: 0 auto 28px;">
+    The page you are looking for doesn't exist or has been moved.
+  </p>
+  <a href="{{ url_for('index') }}" class="btn-primary" style="display: inline-block; width: auto;">Return to Home</a>
+</div>
+{% endblock %}

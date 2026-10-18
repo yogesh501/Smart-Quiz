@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>{% block title %}Smart Quiz — Learn, Play and Test Your Knowledge{% endblock %}</title>
+  <meta name="description" content="A simple, modern, and student-friendly quiz platform for computer science projects.">
+  
+  <!-- Favicon icon using SVG data URI -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+  
+  <!-- Google Fonts & Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Sticky Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="{{ url_for('index') }}" class="brand-link" id="nav-brand-logo">
+        <div class="brand-logo-icon">🎯</div>
+        <div class="brand-text-group">
+          <div class="brand-title">Smart <span>Quiz</span></div>
+        </div>
+      </a>
+
+      <!-- Mobile Hamburger Toggle Button -->
+      <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+
+      <nav class="nav-menu" id="navMenu">
+        <ul class="nav-links">
+          <li class="nav-item">
+            <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}" id="nav-link-home">Home</a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ url_for('index') }}#categories" id="nav-link-categories">Categories</a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ url_for('history') }}" class="{% if request.endpoint == 'history' %}active{% endif %}" id="nav-link-history">History & Scores</a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}" id="nav-link-about">DBMS & Concepts</a>
+          </li>
+          <li class="nav-item nav-db-item">
+            <div class="db-status-pill" title="Active Backend Database Engine">
+              <span class="status-dot {{ db_engine }}"></span>
+              <span>DB: {{ db_engine | upper }}</span>
+            </div>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Flash Alerts -->
+  <div class="container flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Content Block -->
+  <main class="site-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Student Name Entry Modal (Globally Accessible) -->
+  <div class="modal-overlay" id="studentNameModal">
+    <div class="modal-card">
+      <button type="button" class="modal-close-btn" id="modalCloseBtn" aria-label="Close Modal">&times;</button>
+      <div class="modal-icon-badge">✍️</div>
+      <h3 class="modal-title">Start <span id="selectedCategoryName" style="color: var(--primary-purple);">Category</span> Quiz</h3>
+      <p class="modal-subtitle">Enter your student name below to begin your 10-question test:</p>
+      
+      <form id="startQuizForm" method="POST" action="">
+        <div class="form-group">
+          <label for="studentNameInput" class="form-label">Student Name</label>
+          <input type="text" id="studentNameInput" name="student_name" class="form-control" 
+                 placeholder="Enter your full name (e.g., Alex Kumar)" required autocomplete="name" maxlength="50">
+        </div>
+        <div class="modal-btn-row">
+          <button type="button" class="btn-secondary" id="modalCancelBtn">Cancel</button>
+          <button type="submit" class="btn-primary" id="btnConfirmStart">Start Quiz 🚀</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>Smart Quiz</strong> &mdash; Interactive Learning & Quiz Platform
+        <div style="font-size: 12px; margin-top: 4px; color: var(--text-light);">
+          Built with Python Flask, MySQL, HTML5, CSS3, & JavaScript
+        </div>
+      </div>
+      <div class="footer-notes">
+        <a href="{{ url_for('about') }}">Architecture & DBMS Schema</a>
+        <a href="{{ url_for('history') }}">Recent Results</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main Scripts -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

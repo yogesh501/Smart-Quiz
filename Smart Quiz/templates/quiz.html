@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} Quiz — Smart Quiz{% endblock %}
+
+{% block content %}
+<div class="container quiz-container">
+
+  <!-- Top Quiz Header Bar -->
+  <div class="quiz-top-bar">
+    <div class="quiz-category-info">
+      <div class="quiz-cat-icon">
+        {% if category.code == 'java' %}☕
+        {% elif category.code == 'python' %}🐍
+        {% elif category.code == 'mysql' %}🐬
+        {% elif category.code == 'dbms' %}🗄️
+        {% elif category.code == 'history' %}🏛️
+        {% elif category.code == 'science' %}🔬
+        {% else %}📘{% endif %}
+      </div>
+      <div>
+        <h2 class="quiz-meta-title">{{ category.name }} Quiz</h2>
+        <div class="quiz-meta-student">Student: <strong>{{ student_name }}</strong></div>
+      </div>
+    </div>
+
+    <!-- Question Counter & Progress Bar -->
+    <div class="quiz-progress-stats">
+      <div class="question-counter-label" id="questionCounter">Question 1 of {{ total_questions }}</div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressBarFill" style="width: 10%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question Palette Navigation -->
+  <div class="question-palette-card">
+    <span class="palette-label">Question Palette:</span>
+    <div class="palette-bubbles">
+      {% for q in questions %}
+        <button type="button" class="palette-btn {% if loop.first %}active{% endif %}" 
+                id="palette_btn_{{ loop.index0 }}" 
+                data-index="{{ loop.index0 }}"
+                title="Go to Question {{ loop.index }}">
+          {{ loop.index }}
+        </button>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Fallback Form for non-JS / standard POST submission -->
+  <form id="quizForm" method="POST" action="{{ url_for('submit_quiz') }}">
+    
+    <!-- Question Slides -->
+    <div class="quiz-main-card">
+      {% for q in questions %}
+        <div class="question-slide {% if loop.first %}active{% endif %}" id="slide_{{ loop.index0 }}">
+          <span class="question-number-pill">Question {{ loop.index }} of {{ total_questions }}</span>
+          <h3 class="question-text-title">{{ q.question_text }}</h3>
+
+          <!-- Four Answer Options -->
+          <div class="options-list">
+            <div class="option-item" data-question-id="{{ q.id }}" data-option-letter="A" id="opt_{{ q.id }}_A">
+              <span class="option-letter-badge">A</span>
+              <span class="option-text">{{ q.option_a }}</span>
+            </div>
+            <div class="option-item" data-question-id="{{ q.id }}" data-option-letter="B" id="opt_{{ q.id }}_B">
+              <span class="option-letter-badge">B</span>
+              <span class="option-text">{{ q.option_b }}</span>
+            </div>
+            <div class="option-item" data-question-id="{{ q.id }}" data-option-letter="C" id="opt_{{ q.id }}_C">
+              <span class="option-letter-badge">C</span>
+              <span class="option-text">{{ q.option_c }}</span>
+            </div>
+            <div class="option-item" data-question-id="{{ q.id }}" data-option-letter="D" id="opt_{{ q.id }}_D">
+              <span class="option-letter-badge">D</span>
+              <span class="option-text">{{ q.option_d }}</span>
+            </div>
+          </div>
+
+          <!-- Hidden Input for Form fallback -->
+          <input type="hidden" name="q_{{ q.id }}" id="input_q_{{ q.id }}" value="">
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Bottom Actions: Previous, Next, Submit -->
+    <div class="quiz-action-bar">
+      <button type="button" class="btn-nav btn-nav-prev" id="prevBtn" disabled>
+        &larr; Previous
+      </button>
+
+      <div class="quiz-next-group">
+        <button type="button" class="btn-nav btn-nav-next" id="nextBtn">
+          Next Question &rarr;
+        </button>
+        <button type="button" class="btn-submit-quiz" id="submitBtn" style="display: none;">
+          Submit Quiz 🎯
+        </button>
+      </div>
+    </div>
+
+  </form>
+
+</div>
+
+<!-- Submission Confirmation Modal -->
+<div class="modal-overlay" id="submitConfirmModal">
+  <div class="modal-card">
+    <div class="modal-icon-badge" style="background: #ede9fe; color: var(--primary-purple);">📋</div>
+    <h3 class="modal-title">Ready to Submit?</h3>
+    <p class="modal-subtitle">Review your progress before final evaluation:</p>
+    
+    <div class="breakdown-grid" style="margin-bottom: 24px;">
+      <div class="breakdown-box box-correct" style="padding: 12px;">
+        <div class="breakdown-val" id="confirmAnsweredCount" style="font-size: 22px;">0</div>
+        <div class="breakdown-label">Answered</div>
+      </div>
+      <div class="breakdown-box box-incorrect" style="padding: 12px;">
+        <div class="breakdown-val" id="confirmUnansweredCount" style="font-size: 22px;">10</div>
+        <div class="breakdown-label">Unanswered</div>
+      </div>
+    </div>
+
+    <div class="modal-btn-row">
+      <button type="button" class="btn-secondary" id="cancelSubmitBtn">Review Answers</button>
+      <button type="button" class="btn-primary" id="finalSubmitBtn">Yes, Submit Quiz 🚀</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+{% endblock %}
